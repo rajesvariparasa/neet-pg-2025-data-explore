@@ -33,10 +33,16 @@
   <!-- Main Content Area -->
   <div class="container-fluid my-3">
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <div>
-        <button id="toggleFinalAssignment" class="btn btn-sm btn-outline-primary" onclick="toggleFinalAssignmentFilter()">
-          Toggle Final Assignment Only
-        </button>
+      <div class="form-check form-switch m-0">
+        <input 
+          class="form-check-input" 
+          type="checkbox" 
+          role="switch" 
+          id="toggleFinalAssignment" 
+          onchange="toggleFinalAssignmentFilter()">
+        <label class="form-check-label fw-semibold" for="toggleFinalAssignment">
+          Final allotment round only
+        </label>
         <span id="finalStatusText" class="text-muted small ms-2">(Showing all rounds)</span>
       </div>
       <button class="btn btn-sm btn-secondary" onclick="resetAllFilters()">Reset All Filters</button>
