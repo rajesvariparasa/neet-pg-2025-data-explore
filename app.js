@@ -5,7 +5,7 @@ const activeMultiFilters = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Initializing NEET PG Explorer with CSV...");
-  loadCSVData('data.csv');
+  loadCSVData('https://raw.githubusercontent.com/username/repo-name/main/data.csv');
 
   // Close multi-select dropdowns when clicking outside
   document.addEventListener("click", (e) => {
