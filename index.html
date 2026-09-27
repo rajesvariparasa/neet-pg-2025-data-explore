@@ -8,85 +8,46 @@
   <!-- Bootstrap 5 & DataTables -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
-  
-  <!-- Leaflet CSS for Map -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-clean sticky-top">
     <div class="container-fluid px-4">
-      <a class="navbar-brand fw-bold" href="#">🏥 NEET PG Analytics Explorer</a>
-      <span class="navbar-text text-light small" id="data-status">Loading dataset...</span>
+      <a class="navbar-brand" href="#">🏥 NEET PG Allotment Explorer</a>
+      <span class="text-light small opacity-75" id="data-status">Loading dataset...</span>
     </div>
   </nav>
 
   <div class="container-fluid px-4 py-4">
-    <!-- Key Metric Cards -->
-    <div class="row g-3 mb-4">
-      <div class="col-md-3">
-        <div class="card metric-card bg-primary text-white p-3 shadow-sm">
-          <div class="small text-uppercase">Total Seats Allotted</div>
-          <div class="fs-3 fw-bold" id="metric-total-rows">0</div>
+    <div class="content-card p-3">
+      
+      <!-- Top Action Controls -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <!-- Final Assignment Filter Toggle -->
+          <button id="toggleFinalAssignment" class="btn btn-final-assignment" onclick="toggleFinalAssignmentFilter()">
+            📌 Final Assignment Only
+          </button>
+          <span class="text-muted small fs-7" id="finalStatusText">(Showing all rounds)</span>
         </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card metric-card bg-success text-white p-3 shadow-sm">
-          <div class="small text-uppercase">Total Medical Colleges</div>
-          <div class="fs-3 fw-bold" id="metric-colleges">0</div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card metric-card bg-info text-white p-3 shadow-sm">
-          <div class="small text-uppercase">Specialties Offered</div>
-          <div class="fs-3 fw-bold" id="metric-courses">0</div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card metric-card bg-warning text-dark p-3 shadow-sm">
-          <div class="small text-uppercase">Rank Range</div>
-          <div class="fs-4 fw-bold" id="metric-rank-range">-</div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Analytics Section: Top Courses + Interactive Map -->
-    <div class="row g-3 mb-4">
-      <div class="col-lg-6">
-        <div class="card shadow-sm p-3 h-100">
-          <h6 class="fw-bold mb-3">Top Specialties by Seat Allotment</h6>
-          <!-- Fixed height wrapper prevents canvas stretching -->
-          <div class="chart-container">
-            <canvas id="courseChart"></canvas>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6">
-        <div class="card shadow-sm p-3 h-100">
-          <h6 class="fw-bold mb-2">College Map Distribution</h6>
-          <div id="map" style="height: 280px; border-radius: 6px;"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Data Explorer & Filter Section -->
-    <div class="card shadow-sm p-3">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold m-0">Explore Seats, Cutoffs & Allotments</h5>
-        <div>
-          <button class="btn btn-sm btn-outline-danger me-2" onclick="resetAllFilters()">🔄 Reset Filters</button>
-          <button class="btn btn-sm btn-outline-secondary" onclick="copyShareLink()">🔗 Share Link</button>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary" onclick="resetAllFilters()">🔄 Reset Filters</button>
+          <button class="btn btn-sm btn-outline-primary" onclick="copyShareLink()">🔗 Share Link</button>
         </div>
       </div>
 
-      <!-- Interactive Multi-Field Filters -->
-      <div class="row g-2 mb-3 bg-light p-3 rounded border" id="filter-container">
-        <!-- Generated dynamically via app.js -->
+      <!-- Multi-Select Dropdown Filters -->
+      <div class="filter-box mb-3">
+        <div class="row g-2" id="filter-container">
+          <!-- Populated dynamically via app.js -->
+        </div>
       </div>
 
-      <div class="table-responsive">
-        <table id="neetTable" class="table table-striped table-hover align-middle w-100">
+      <!-- Data Table -->
+      <div class="table-container">
+        <table id="neetTable" class="table table-hover align-middle w-100">
           <thead>
             <tr>
               <th>Rank</th>
@@ -98,11 +59,14 @@
               <th>Round</th>
               <th>State</th>
               <th>Area</th>
+              <th>Remarks</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
+
     </div>
   </div>
 
@@ -112,8 +76,6 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
