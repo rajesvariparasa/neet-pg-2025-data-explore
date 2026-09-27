@@ -4,7 +4,8 @@ let onlyFinalAssignment = false;
 const activeMultiFilters = {};
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadTSVData('data.tsv');
+  console.log("Initializing NEET PG Explorer with CSV...");
+  loadCSVData('data.csv');
 
   // Close multi-select dropdowns when clicking outside
   document.addEventListener("click", (e) => {
@@ -14,54 +15,78 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-function loadTSVData(filePath) {
+function loadCSVData(filePath) {
+  const statusEl = document.getElementById("data-status");
+  
   Papa.parse(filePath, {
     download: true,
     header: true,
-    delimiter: "\t",
+    delimiter: "", // Auto-detect delimiter (works for comma CSV and tab TSV)
     skipEmptyLines: true,
     complete: function (results) {
-      rawData = results.data;
-      if (!rawData || rawData.length === 0) {
-        document.getElementById("data-status").innerText = "Error: Dataset is empty.";
+      console.log("PapaParse complete. Raw results:", results);
+
+      if (!results.data || results.data.length === 0) {
+        if (statusEl) statusEl.innerText = "Error: data.csv is empty or could not be read.";
+        console.error("Parsed data is empty:", results.errors);
         return;
       }
-      document.getElementById("data-status").innerText = `${rawData.length.toLocaleString()} records loaded`;
-      renderTable(rawData);
+
+      rawData = results.data;
+      if (statusEl) {
+        statusEl.innerText = `${rawData.length.toLocaleString()} records loaded successfully`;
+      }
+      
+      initDataTable(rawData);
     },
     error: function (err) {
-      document.getElementById("data-status").innerText = "Failed to load data.tsv file.";
-      console.error(err);
+      console.error("PapaParse failed to load file:", err);
+      if (statusEl) {
+        statusEl.innerText = "Error loading data.csv. Make sure the file exists and you are running via a local web server.";
+      }
     }
   });
 }
 
-function renderTable(data) {
+function getFieldValue(row, keys) {
+  for (const k of keys) {
+    if (row[k] !== undefined && row[k] !== null && row[k] !== "") return row[k];
+  }
+  return "";
+}
+
+function initDataTable(data) {
+  // Safe field extraction matching variations in CSV column header names
   const tableData = data.map(d => [
-    parseInt(d.Rank, 10) || d.Rank || "",
-    d.Allot_Quota || "",
-    d.Institute || "",
-    d.Course || "",
-    d.Allot_Cat || "",
-    d.Cand_Cat || "",
-    d.Round || "",
-    d.State || "",
-    d.Area || "",
-    d.Remarks || "",
-    d.Round_assignment_status || ""
+    parseInt(getFieldValue(d, ['Rank', 'rank', 'AIR']), 10) || getFieldValue(d, ['Rank', 'rank', 'AIR']) || "-",
+    getFieldValue(d, ['Allot_Quota', 'Quota', 'quota', 'Allotted Quota']),
+    getFieldValue(d, ['Institute', 'institute', 'College']),
+    getFieldValue(d, ['Course', 'course', 'Specialty']),
+    getFieldValue(d, ['Allot_Cat', 'allot_cat', 'Allotted Category']),
+    getFieldValue(d, ['Cand_Cat', 'cand_cat', 'Candidate Category']),
+    getFieldValue(d, ['Round', 'round']),
+    getFieldValue(d, ['State', 'state']),
+    getFieldValue(d, ['Area', 'area']),
+    getFieldValue(d, ['Remarks', 'remarks', 'Remark']),
+    getFieldValue(d, ['Round_assignment_status', 'round_assignment_status', 'Status', 'status'])
   ]);
 
-  // Custom DataTables Filter Functions
+  if ($.fn.DataTable.isDataTable('#neetTable')) {
+    $('#neetTable').DataTable().destroy();
+    $('#neetTable').empty();
+  }
+
+  // Custom DataTables Filter Logic
   $.fn.dataTable.ext.search.push(function (settings, rowData) {
     // 1. Final Assignment Toggle Filter
     if (onlyFinalAssignment) {
-      const assignmentStatus = (rowData[10] || "").toLowerCase();
-      if (!assignmentStatus.includes("final assignment")) {
+      const assignmentStatus = (rowData[10] || "").toString().toLowerCase();
+      if (!assignmentStatus.includes("final assignment") && !assignmentStatus.includes("final")) {
         return false;
       }
     }
 
-    // 2. Rank Min/Max Range Filter
+    // 2. Rank Range Filter
     const minRank = parseInt($('#minRank').val(), 10);
     const maxRank = parseInt($('#maxRank').val(), 10);
     const rankVal = parseFloat(rowData[0]) || 0;
@@ -69,10 +94,10 @@ function renderTable(data) {
     if (!isNaN(minRank) && rankVal < minRank) return false;
     if (!isNaN(maxRank) && rankVal > maxRank) return false;
 
-    // 3. Multi-select Dropdown Filters
+    // 3. Multi-Select Dropdowns
     for (const [colIndex, selectedValues] of Object.entries(activeMultiFilters)) {
       if (selectedValues && selectedValues.length > 0) {
-        const cellValue = rowData[colIndex] || "";
+        const cellValue = (rowData[colIndex] || "").toString();
         if (!selectedValues.includes(cellValue)) {
           return false;
         }
@@ -82,6 +107,7 @@ function renderTable(data) {
     return true;
   });
 
+  // Initialize DataTables
   dataTableInstance = $('#neetTable').DataTable({
     data: tableData,
     pageLength: 25,
@@ -89,17 +115,26 @@ function renderTable(data) {
     order: [[0, 'asc']],
     responsive: true,
     deferRender: true,
-    columnDefs: [
-      { targets: 0, className: "rank-col" },
+    columns: [
+      { title: "Rank", className: "rank-col" },
+      { title: "Quota" },
+      { title: "Institute" },
+      { title: "Course" },
+      { title: "Allotted Cat" },
+      { title: "Cand Cat" },
+      { title: "Round" },
+      { title: "State" },
+      { title: "Area" },
       { 
-        targets: 9, 
+        title: "Remarks",
         render: function(data) {
-          return data ? `<span class="badge-tag">${data}</span>` : "-";
+          return data && data !== "-" ? `<span class="badge-tag">${data}</span>` : "-";
         } 
       },
-      { targets: 10, visible: false } // Hidden column used for final assignment status filtering
+      { title: "Status", visible: false }
     ],
     initComplete: function () {
+      console.log("DataTable rendering complete.");
       setupMultiSelectFilters(this.api());
     }
   });
@@ -107,6 +142,7 @@ function renderTable(data) {
 
 function setupMultiSelectFilters(api) {
   const filterContainer = document.getElementById("filter-container");
+  if (!filterContainer) return;
   filterContainer.innerHTML = "";
 
   const filterColumns = [
@@ -120,7 +156,7 @@ function setupMultiSelectFilters(api) {
 
   filterColumns.forEach(col => {
     const column = api.column(col.index);
-    const uniqueVals = column.data().unique().toArray().filter(Boolean).sort();
+    const uniqueVals = column.data().unique().toArray().filter(v => v && v !== "-").sort();
 
     activeMultiFilters[col.index] = [];
 
@@ -170,7 +206,7 @@ function setupMultiSelectFilters(api) {
           btn.innerText = `${checked.length} selected`;
         }
 
-        dataTableInstance.draw();
+        if (dataTableInstance) dataTableInstance.draw();
       });
 
       item.appendChild(chk);
@@ -185,7 +221,7 @@ function setupMultiSelectFilters(api) {
     filterContainer.appendChild(colDiv);
   });
 
-  // Rank Range Filter Inputs (Min Rank & Max Rank)
+  // Min / Max Rank Range Controls
   const rankDiv = document.createElement("div");
   rankDiv.className = "col-md-4 col-sm-8 d-flex gap-2 align-items-end";
   rankDiv.innerHTML = `
@@ -202,38 +238,35 @@ function setupMultiSelectFilters(api) {
   filterContainer.appendChild(rankDiv);
 
   $('#minRank, #maxRank').on('keyup change', function () {
-    dataTableInstance.draw();
+    if (dataTableInstance) dataTableInstance.draw();
   });
 }
 
-// Toggle Final Assignment Filter State
 function toggleFinalAssignmentFilter() {
   onlyFinalAssignment = !onlyFinalAssignment;
   const btn = document.getElementById("toggleFinalAssignment");
   const text = document.getElementById("finalStatusText");
 
   if (onlyFinalAssignment) {
-    btn.classList.add("active");
-    text.innerText = "(Showing final allotted status only)";
+    if (btn) btn.classList.add("active");
+    if (text) text.innerText = "(Showing final allotted status only)";
   } else {
-    btn.classList.remove("active");
-    text.innerText = "(Showing all rounds)";
+    if (btn) btn.classList.remove("active");
+    if (text) text.innerText = "(Showing all rounds)";
   }
 
-  dataTableInstance.draw();
+  if (dataTableInstance) dataTableInstance.draw();
 }
 
-// Reset All Filters
 function resetAllFilters() {
   onlyFinalAssignment = false;
   const btn = document.getElementById("toggleFinalAssignment");
   const text = document.getElementById("finalStatusText");
-  btn.classList.remove("active");
-  text.innerText = "(Showing all rounds)";
+  if (btn) btn.classList.remove("active");
+  if (text) text.innerText = "(Showing all rounds)";
 
   $('#minRank, #maxRank').val('');
 
-  // Uncheck all multi-select items
   document.querySelectorAll(".multiselect-item input").forEach(chk => chk.checked = false);
   for (const key in activeMultiFilters) {
     activeMultiFilters[key] = [];
