@@ -1,15 +1,17 @@
 let rawData = [];
 let dataTableInstance = null;
+let courseChartInstance = null;
 let mapInstance = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadCSVData('data.csv');
+  loadTSVData('data.tsv');
 });
 
-function loadCSVData(filePath) {
+function loadTSVData(filePath) {
   Papa.parse(filePath, {
     download: true,
     header: true,
+    delimiter: "\t",
     skipEmptyLines: true,
     complete: function (results) {
       rawData = results.data;
@@ -21,14 +23,14 @@ function loadCSVData(filePath) {
       initDashboard(rawData);
     },
     error: function (err) {
-      document.getElementById("data-status").innerText = "Failed to load data.csv file.";
+      document.getElementById("data-status").innerText = "Failed to load data.tsv file.";
       console.error(err);
     }
   });
 }
 
 function initDashboard(data) {
-  // Metric Calculations
+  // Metrics
   document.getElementById("metric-total-rows").innerText = data.length.toLocaleString();
 
   const uniqueColleges = new Set(data.map(d => d.Institute).filter(Boolean)).size;
@@ -60,7 +62,12 @@ function renderChart(data) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
 
-  new Chart(document.getElementById("courseChart"), {
+  if (courseChartInstance) {
+    courseChartInstance.destroy();
+  }
+
+  const ctx = document.getElementById("courseChart").getContext("2d");
+  courseChartInstance = new Chart(ctx, {
     type: "bar",
     data: {
       labels: sortedCourses.map(c => c[0]),
@@ -72,25 +79,31 @@ function renderChart(data) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: false, // Allows chart to respect the .chart-container height
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { font: { size: 10 } } }
+        x: { ticks: { font: { size: 9 }, callback: function(val, index) {
+          const label = this.getLabelForValue(val);
+          return label.length > 20 ? label.substr(0, 20) + '...' : label;
+        }}}
       }
     }
   });
 }
 
 function initMap(data) {
-  mapInstance = L.map('map').setView([20.5937, 78.9629], 4.5); // India center
+  if (mapInstance) {
+    mapInstance.remove();
+  }
+
+  mapInstance = L.map('map').setView([20.5937, 78.9629], 4.5);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
+    attribution: '&copy; OpenStreetMap'
   }).addTo(mapInstance);
 
   const collegeMap = new Map();
 
-  // Group lat/lon by institute
   data.forEach(d => {
     const lat = parseFloat(d.Lat);
     const lon = parseFloat(d.Lon);
@@ -111,7 +124,7 @@ function initMap(data) {
       opacity: 1,
       fillOpacity: 0.7
     })
-    .bindPopup(`<b>${col.name}</b><br>${col.state || ''}<br>Total Seat Allotments: <b>${col.count}</b>`)
+    .bindPopup(`<b>${col.name}</b><br>${col.state || ''}<br>Total Allotments: <b>${col.count}</b>`)
     .addTo(mapInstance);
   });
 }
@@ -129,11 +142,26 @@ function renderTable(data) {
     d.Area || ""
   ]);
 
+  // Add custom Rank Range Filter to DataTables
+  $.fn.dataTable.ext.search.push(function (settings, data) {
+    const min = parseInt($('#minRank').val(), 10);
+    const max = parseInt($('#maxRank').val(), 10);
+    const rank = parseFloat(data[0]) || 0;
+
+    if ((isNaN(min) && isNaN(max)) ||
+        (isNaN(min) && rank <= max) ||
+        (min <= rank && isNaN(max)) ||
+        (min <= rank && rank <= max)) {
+      return true;
+    }
+    return false;
+  });
+
   dataTableInstance = $('#neetTable').DataTable({
     data: tableData,
     pageLength: 25,
     lengthMenu: [10, 25, 50, 100, 500],
-    order: [[0, 'asc']], // Order by Rank ascending
+    order: [[0, 'asc']],
     responsive: true,
     deferRender: true,
     initComplete: function () {
@@ -146,24 +174,30 @@ function setupFilters(api) {
   const filterContainer = document.getElementById("filter-container");
   filterContainer.innerHTML = "";
 
-  // Column Index Mapping: 1: Quota, 3: Course, 4: Allot Cat, 6: Round, 7: State
+  // Column Index Mapping
   const filterColumns = [
     { index: 1, name: "Quota" },
     { index: 3, name: "Course" },
-    { index: 4, name: "Category" },
+    { index: 4, name: "Allotted Cat" },
+    { index: 5, name: "Cand Cat" },
     { index: 6, name: "Round" },
     { index: 7, name: "State" }
   ];
 
+  // Dropdown Select Filters
   filterColumns.forEach(col => {
     const column = api.column(col.index);
     const uniqueVals = column.data().unique().toArray().filter(Boolean).sort();
 
     const colDiv = document.createElement("div");
-    colDiv.className = "col-md-2.4 col-sm-6";
+    colDiv.className = "col-md-2 col-sm-4";
+
+    const label = document.createElement("div");
+    label.className = "filter-label";
+    label.innerText = col.name;
 
     const select = document.createElement("select");
-    select.className = "form-select form-select-sm";
+    select.className = "form-select form-select-sm filter-control";
     select.innerHTML = `<option value="">All ${col.name}s</option>` +
       uniqueVals.map(v => `<option value="${v}">${v}</option>`).join("");
 
@@ -172,13 +206,43 @@ function setupFilters(api) {
       column.search(val ? `^${val}$` : '', true, false).draw();
     });
 
+    colDiv.appendChild(label);
     colDiv.appendChild(select);
     filterContainer.appendChild(colDiv);
   });
+
+  // Rank Range Filter Inputs (Min Rank & Max Rank)
+  const rankDiv = document.createElement("div");
+  rankDiv.className = "col-md-4 col-sm-8 d-flex gap-2 align-items-end";
+  rankDiv.innerHTML = `
+    <div class="w-50">
+      <div class="filter-label">Min Rank</div>
+      <input type="number" id="minRank" class="form-control form-control-sm filter-control" placeholder="e.g. 1">
+    </div>
+    <div class="w-50">
+      <div class="filter-label">Max Rank</div>
+      <input type="number" id="maxRank" class="form-control form-control-sm filter-control" placeholder="e.g. 5000">
+    </div>
+  `;
+
+  filterContainer.appendChild(rankDiv);
+
+  $('#minRank, #maxRank').on('keyup change', function () {
+    dataTableInstance.draw();
+  });
+}
+
+function resetAllFilters() {
+  $('.filter-control').val('');
+  if (dataTableInstance) {
+    dataTableInstance.columns().search('').draw();
+    $.fn.dataTable.ext.search.pop(); // Clear rank search
+    dataTableInstance.draw();
+  }
 }
 
 function copyShareLink() {
   navigator.clipboard.writeText(window.location.href).then(() => {
-    alert("Dashboard link copied to clipboard!");
+    alert("Page URL copied to clipboard!");
   });
 }
