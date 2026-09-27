@@ -225,6 +225,36 @@ body {
   display: none !important;
 }
 
+.data-disclaimer {
+  margin: 0;
+  padding: 0.7rem 1rem;
+  background: #fff8e1;
+  border-bottom: 1px solid #e6d8a8;
+  color: #5f5125;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.data-disclaimer details {
+  margin-top: 0.4rem;
+}
+
+.data-disclaimer summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.data-disclaimer p {
+  max-width: 1000px;
+  margin: 0.6rem 0 0;
+}
+
+@media (max-width: 768px) {
+  .data-disclaimer {
+    font-size: 0.8rem;
+    padding: 0.65rem 0.75rem;
+  }
+}
 @media (max-width: 768px) {
   .multiselect-menu {
     position: fixed;
