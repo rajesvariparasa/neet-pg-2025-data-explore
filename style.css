@@ -198,3 +198,43 @@ body {
     align-items: flex-start !important;
   }
 }
+
+
+.filter-search-wrap {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  padding: 0.25rem 0.25rem 0.45rem;
+  z-index: 1;
+}
+
+.filter-search {
+  width: 100%;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.filter-options {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.multiselect-item[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .multiselect-menu {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    top: auto;
+    max-height: min(60vh, 420px);
+  }
+
+  #neetTable {
+    font-size: 0.82rem;
+  }
+}

@@ -43,6 +43,8 @@ function renderFilterContainer() {
 }
 
 function renderMultiselect(id, label) {
+  const searchable = id === "course";
+
   return `
     <div class="filter-item">
       <div class="filter-label">${label}</div>
@@ -53,7 +55,19 @@ function renderMultiselect(id, label) {
           Select ${label}
         </button>
         <div class="multiselect-menu" id="menu-${id}" role="group"
-             aria-label="${label} options"></div>
+             aria-label="${label} options">
+          ${searchable ? `
+            <div class="filter-search-wrap">
+              <input type="search"
+                     class="filter-search"
+                     id="courseSearch"
+                     placeholder="Search courses..."
+                     autocomplete="off"
+                     aria-label="Search courses">
+            </div>
+          ` : ""}
+          <div class="filter-options" id="options-${id}"></div>
+        </div>
       </div>
     </div>
   `;
@@ -81,15 +95,18 @@ function normalizeRow(row) {
 }
 
 function loadData() {
-  setDataStatus("Loading data...");
+  fetch("./data.csv", { cache: "no-store" })
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.text();
+    })
+    .then(csvText => {
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: "greedy",
+        dynamicTyping: false,
 
-  Papa.parse("./data.csv", {
-    download: true,
-    header: true,
-    skipEmptyLines: "greedy",
-    dynamicTyping: false,
-
-    complete(results) {
+        complete(results) {
       if (results.errors && results.errors.length) {
         console.warn("CSV parsing warnings:", results.errors);
       }
@@ -108,16 +125,21 @@ function loadData() {
         return;
       }
 
-      initializeExplorer();
-    },
+        initializeExplorer();
+        },
 
-    error(error) {
+        error(error) {
+          console.error("CSV parse failed:", error);
+          showDataError("The dataset could not be parsed.");
+        }
+      });
+    })
+    .catch(error => {
       console.error("CSV load failed:", error);
       showDataError(
-        "Unable to load data.csv. Please make sure the file is available next to index.html."
+        "Unable to load data.csv. Please refresh and try again."
       );
-    }
-  });
+    });
 }
 
 function initializeExplorer() {
@@ -148,7 +170,9 @@ function populateAllFilters() {
 
     const values = getUniqueValues(config.field);
 
-    menu.innerHTML = values.map((value, index) => {
+    const options = menu.querySelector(`#options-${id}`) || menu;
+
+    options.innerHTML = values.map((value, index) => {
       const safeId = `${id}-${index}`;
       return `
         <label class="multiselect-item" for="${safeId}">
@@ -162,7 +186,7 @@ function populateAllFilters() {
     }).join("");
 
     if (!values.length) {
-      menu.innerHTML = `<div class="text-muted small p-2">No values available</div>`;
+      options.innerHTML = `<div class="text-muted small p-2">No values available</div>`;
     }
   });
 }
@@ -276,6 +300,7 @@ function renderTable(data) {
     pageLength: 25,
     pageLengthMenu: [[25, 50, 100, 250], [25, 50, 100, 250]],
     responsive: true,
+    autoWidth: false,
     deferRender: true,
     order: [[0, "asc"]],
     language: {
@@ -353,12 +378,6 @@ function updateResultCount() {
 }
 
 function updateDataStatus() {
-  const status = document.getElementById("data-status");
-  if (!status) return;
-
-  status.textContent =
-    `${rawData.length.toLocaleString()} assignments · ` +
-    `${new Set(rawData.map(row => row.Rank)).size.toLocaleString()} ranks`;
 }
 
 function setDataStatus(text) {
@@ -367,7 +386,6 @@ function setDataStatus(text) {
 }
 
 function showDataError(message) {
-  setDataStatus("Data unavailable");
   const count = document.getElementById("result-count");
   if (count) count.textContent = message;
 
@@ -523,6 +541,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    const courseSearch = event.target.closest("#courseSearch");
+    if (courseSearch) {
+      return;
+    }
+
     if (event.target.closest("#toggleFinalAssignment")) {
       toggleFinalAssignmentFilter();
       return;
@@ -544,6 +567,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("input", event => {
     if (event.target.id === "minRank" || event.target.id === "maxRank") {
       applyFilters();
+      return;
+    }
+
+    if (event.target.id === "courseSearch") {
+      const query = event.target.value.trim().toLocaleLowerCase();
+      document.querySelectorAll('#options-course .multiselect-item').forEach(item => {
+        const text = item.textContent.toLocaleLowerCase();
+        item.hidden = query !== "" && !text.includes(query);
+      });
     }
   });
 
