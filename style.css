@@ -1,37 +1,211 @@
+/* COVID19India Inspired Theme - Subtle, Muted, Clean Typography */
+:root {
+  --bg-main: #f6f8fa;
+  --card-bg: #ffffff;
+  --text-primary: #24292e;
+  --text-secondary: #6a737d;
+  --border-color: #e1e4e8;
+  --accent-blue: #0366d6;
+  --accent-blue-light: #f1f8ff;
+  --toggle-active-bg: #28a745;
+  --toggle-active-border: #28a745;
+}
+
 body {
-  background-color: #f8f9fa;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
-.metric-card {
-  border: none;
-  border-radius: 8px;
+/* Navbar */
+.navbar-clean {
+  background-color: #1b1f23;
+  padding: 0.75rem 1.5rem;
 }
 
-/* Fix Chart stretching issue */
-.chart-container {
-  position: relative;
-  height: 280px; /* Fixed height prevents canvas stretching */
-  width: 100%;
+.navbar-brand {
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.3px;
+  color: #fff !important;
 }
 
-.table-responsive {
-  font-size: 0.86rem;
+/* Data Explorer Card */
+.content-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-table.dataTable thead th {
-  background-color: #eef2f7;
-  color: #333;
-}
-
-#map {
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+/* Filter Controls Header */
+.filter-box {
+  background-color: #fafbfc;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
 }
 
 .filter-label {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  color: #6c757d;
-  margin-bottom: 2px;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+/* Custom Select Styling */
+.form-select-sm, .form-control-sm {
+  font-size: 0.82rem;
+  border-color: var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
+.form-select-sm:focus, .form-control-sm:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.15);
+}
+
+/* Multi-select Dropdown Styling */
+.multiselect-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.multiselect-btn {
+  width: 100%;
+  text-align: left;
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.multiselect-btn::after {
+  content: "▾";
+  font-size: 0.7rem;
+  margin-left: 6px;
+  color: var(--text-secondary);
+}
+
+.multiselect-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 0.4rem 0;
+}
+
+.multiselect-menu.show {
+  display: block;
+}
+
+.multiselect-item {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.multiselect-item:hover {
+  background-color: var(--accent-blue-light);
+}
+
+.multiselect-item input[type="checkbox"] {
+  cursor: pointer;
+}
+
+/* Table Styling */
+.table-container {
+  overflow-x: auto;
+}
+
+table.dataTable {
+  border-collapse: collapse !important;
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  width: 100% !important;
+}
+
+table.dataTable thead th {
+  background-color: #f6f8fa;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 2px solid var(--border-color) !important;
+  padding: 8px 10px;
+}
+
+table.dataTable tbody td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+table.dataTable tbody tr:hover {
+  background-color: #f1f8ff !important;
+}
+
+/* Monospace Numerical Values for Clean Alignment */
+.rank-col {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-weight: 600;
+  color: #0366d6;
+}
+
+.badge-tag {
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+  background-color: #eaecef;
+  color: #24292e;
+}
+
+/* Final Assignment Toggle Button */
+.btn-final-assignment {
+  background-color: #ffffff;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 4px;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-final-assignment.active {
+  background-color: var(--toggle-active-bg);
+  color: #ffffff;
+  border-color: var(--toggle-active-border);
+}
+
+.btn-final-assignment:focus {
+  box-shadow: none;
 }
