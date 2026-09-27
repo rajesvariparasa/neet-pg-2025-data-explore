@@ -1,25 +1,45 @@
-/* Sticky Navbar at top of screen */
+/* Sticky Navigation Bar */
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 1030;
+  z-index: 1040;
 }
 
-/* Sticky Filter Panel directly under Navbar */
+/* Sticky Filter Container - Fixed directly below navbar */
 #filter-container {
   position: sticky;
-  top: 56px; /* Height of the Bootstrap navbar */
-  z-index: 1020;
+  top: 56px; /* Navbar height */
+  z-index: 1030;
   background-color: #ffffff;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Multiselect Dropdown Styling */
+/* Horizontal Filters Wrapper */
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.filter-item {
+  flex: 0 0 160px; /* Fixed width for consistent horizontal dropdowns */
+  min-width: 140px;
+}
+
+.rank-filter-item {
+  flex: 0 0 220px;
+}
+
+/* Dropdown styling */
 .filter-label {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   color: #6c757d;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .multiselect-dropdown {
@@ -40,12 +60,6 @@
   white-space: nowrap;
 }
 
-.multiselect-btn:focus {
-  outline: none;
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
 .multiselect-menu {
   display: none;
   position: absolute;
@@ -58,7 +72,7 @@
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1040 !important; /* Ensure menu stays above sticky table headers */
+  z-index: 1050 !important; /* Ensure menu displays above table header */
   padding: 0.5rem;
 }
 
@@ -73,14 +87,22 @@
   font-size: 0.85rem;
   padding: 0.2rem 0.4rem;
   cursor: pointer;
-  border-radius: 0.2rem;
 }
 
 .multiselect-item:hover {
   background-color: #f8f9fa;
 }
 
-/* Table Styling & Badge */
+/* Sticky Table Header (CSS Sticky) */
+#neetTable thead th {
+  position: sticky;
+  top: 118px; /* Sum of Navbar (~56px) + Filter Panel (~62px) */
+  background-color: #f8f9fa !important;
+  z-index: 1020;
+  box-shadow: inset 0 -2px 0 #dee2e6; /* Bottom border effect */
+}
+
+/* Table layout tweaks */
 .rank-col {
   font-weight: 600;
 }
