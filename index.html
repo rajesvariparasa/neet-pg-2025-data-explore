@@ -1,81 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NEET PG Seat Allotment Explorer</title>
-  
-  <!-- Bootstrap 5 & DataTables -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEET PG Explorer</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+  <!-- DataTables FixedHeader CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.bootstrap5.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-clean sticky-top">
-    <div class="container-fluid px-4">
-      <a class="navbar-brand" href="#">🏥 NEET PG Allotment Explorer</a>
-      <span class="text-light small opacity-75" id="data-status">Loading dataset...</span>
+  <!-- Sticky Navbar -->
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">NEET PG Explorer</span>
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-light small opacity-75" id="data-status">Loading data...</span>
+        <button class="btn btn-outline-light btn-sm" onclick="copyShareLink()">Share Link</button>
+      </div>
     </div>
   </nav>
 
-  <div class="container-fluid px-4 py-4">
-    <div class="content-card p-3">
-      
-      <!-- Top Action Controls -->
-      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-        <div class="d-flex align-items-center gap-2">
-          <!-- Final Assignment Filter Toggle -->
-          <button id="toggleFinalAssignment" class="btn btn-final-assignment" onclick="toggleFinalAssignmentFilter()">
-            📌 Final Assignment Only
-          </button>
-          <span class="text-muted small fs-7" id="finalStatusText">(Showing all rounds)</span>
-        </div>
+  <!-- Sticky Filter Container -->
+  <div id="filter-container" class="container-fluid border-bottom bg-white shadow-sm py-2">
+    <!-- Dynamic multi-select and rank filters rendered by app.js -->
+  </div>
 
-        <div class="d-flex gap-2">
-          <button class="btn btn-sm btn-outline-secondary" onclick="resetAllFilters()">🔄 Reset Filters</button>
-          <button class="btn btn-sm btn-outline-primary" onclick="copyShareLink()">🔗 Share Link</button>
-        </div>
+  <!-- Main Content Area -->
+  <div class="container-fluid my-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <div>
+        <button id="toggleFinalAssignment" class="btn btn-sm btn-outline-primary" onclick="toggleFinalAssignmentFilter()">
+          Toggle Final Assignment Only
+        </button>
+        <span id="finalStatusText" class="text-muted small ms-2">(Showing all rounds)</span>
       </div>
+      <button class="btn btn-sm btn-secondary" onclick="resetAllFilters()">Reset All Filters</button>
+    </div>
 
-      <!-- Multi-Select Dropdown Filters -->
-      <div class="filter-box mb-3">
-        <div class="row g-2" id="filter-container">
-          <!-- Populated dynamically via app.js -->
-        </div>
-      </div>
-
-      <!-- Data Table -->
-      <div class="table-container">
-        <table id="neetTable" class="table table-hover align-middle w-100">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Quota</th>
-              <th>Institute</th>
-              <th>Course</th>
-              <th>Allotted Cat</th>
-              <th>Cand Cat</th>
-              <th>Round</th>
-              <th>State</th>
-              <th>Area</th>
-              <th>Remarks</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
+    <!-- Data Table -->
+    <div class="table-responsive">
+      <table id="neetTable" class="table table-striped table-hover table-bordered w-100">
+        <!-- Rendered by DataTables in app.js -->
+      </table>
     </div>
   </div>
 
-  <!-- JS Libraries -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- jQuery & Bootstrap Bundle JS -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- DataTables JS -->
   <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+  <!-- DataTables FixedHeader JS -->
+  <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+  <!-- PapaParse CSV Parser -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- Custom JS -->
   <script src="app.js"></script>
 </body>
 </html>
