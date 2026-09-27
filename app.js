@@ -55,7 +55,7 @@ function loadData() {
   const dataStatus = document.getElementById('data-status');
 
   // Replace 'data.csv' with your local CSV path if applicable
-  Papa.parse("data.csv", {
+  Papa.parse("./data.csv", {
     download: true,
     header: true,
     skipEmptyLines: true,
