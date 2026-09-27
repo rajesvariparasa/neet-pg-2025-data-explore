@@ -1,121 +1,89 @@
-/* Sticky Navigation Bar */
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1040;
+/* Helper function to generate dynamic filters inside #filter-container */
+function renderFilterContainer() {
+  const container = document.getElementById('filter-container');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="filters-row">
+      <div class="filter-item">
+        <div class="filter-label">Round</div>
+        <div class="multiselect-dropdown" id="dropdown-round">
+          <button class="multiselect-btn" type="button" onclick="toggleDropdown('round')">Select Round</button>
+          <div class="multiselect-menu" id="menu-round"></div>
+        </div>
+      </div>
+      
+      <div class="filter-item">
+        <div class="filter-label">Quota</div>
+        <div class="multiselect-dropdown" id="dropdown-quota">
+          <button class="multiselect-btn" type="button" onclick="toggleDropdown('quota')">Select Quota</button>
+          <div class="multiselect-menu" id="menu-quota"></div>
+        </div>
+      </div>
+
+      <div class="filter-item">
+        <div class="filter-label">Category</div>
+        <div class="multiselect-dropdown" id="dropdown-category">
+          <button class="multiselect-btn" type="button" onclick="toggleDropdown('category')">Select Category</button>
+          <div class="multiselect-menu" id="menu-category"></div>
+        </div>
+      </div>
+
+      <div class="filter-item">
+        <div class="filter-label">Course</div>
+        <div class="multiselect-dropdown" id="dropdown-course">
+          <button class="multiselect-btn" type="button" onclick="toggleDropdown('course')">Select Course</button>
+          <div class="multiselect-menu" id="menu-course"></div>
+        </div>
+      </div>
+
+      <div class="rank-filter-item">
+        <div class="filter-label">Rank Range</div>
+        <div class="d-flex gap-1">
+          <input type="number" id="minRank" class="form-control form-control-sm" placeholder="Min">
+          <input type="number" id="maxRank" class="form-control form-control-sm" placeholder="Max">
+        </div>
+      </div>
+    </div>
+  `;
 }
 
-/* Sticky Filter Container - Fixed directly below navbar */
-#filter-container {
-  position: sticky;
-  top: 56px; /* Navbar height */
-  z-index: 1030;
-  background-color: #ffffff;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #dee2e6;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+/* Handler for the Final Allotment Round Only switch */
+function toggleFinalAssignmentFilter() {
+  const toggleSwitch = document.getElementById('toggleFinalAssignment');
+  const statusText = document.getElementById('finalStatusText');
+
+  if (toggleSwitch && toggleSwitch.checked) {
+    statusText.textContent = '(Final allotment only)';
+    // Implement custom data table filtering logic here
+  } else {
+    statusText.textContent = '(Showing all rounds)';
+    // Reset or show all rounds filtering logic here
+  }
 }
 
-/* Horizontal Filters Wrapper */
-.filters-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 1rem;
+/* Helper to toggle dropdown visibility */
+function toggleDropdown(id) {
+  const menu = document.getElementById(`menu-${id}`);
+  if (menu) {
+    menu.classList.toggle('show');
+  }
 }
 
-.filter-item {
-  flex: 0 0 160px; /* Fixed width for consistent horizontal dropdowns */
-  min-width: 140px;
+/* Helper to reset all filters */
+function resetAllFilters() {
+  const toggleSwitch = document.getElementById('toggleFinalAssignment');
+  if (toggleSwitch) {
+    toggleSwitch.checked = false;
+    toggleFinalAssignmentFilter();
+  }
+  const minRank = document.getElementById('minRank');
+  const maxRank = document.getElementById('maxRank');
+  if (minRank) minRank.value = '';
+  if (maxRank) maxRank.value = '';
 }
 
-.rank-filter-item {
-  flex: 0 0 220px;
-}
-
-/* Dropdown styling */
-.filter-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: #6c757d;
-  margin-bottom: 4px;
-}
-
-.multiselect-dropdown {
-  position: relative;
-  width: 100%;
-}
-
-.multiselect-btn {
-  width: 100%;
-  text-align: left;
-  background-color: #ffffff;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.multiselect-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 250px;
-  overflow-y: auto;
-  background-color: #ffffff;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1050 !important; /* Ensure menu displays above table header */
-  padding: 0.5rem;
-}
-
-.multiselect-menu.show {
-  display: block;
-}
-
-.multiselect-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  padding: 0.2rem 0.4rem;
-  cursor: pointer;
-}
-
-.multiselect-item:hover {
-  background-color: #f8f9fa;
-}
-
-/* Sticky Table Header (CSS Sticky) */
-#neetTable thead th {
-  position: sticky;
-  top: 118px; /* Sum of Navbar (~56px) + Filter Panel (~62px) */
-  background-color: #f8f9fa !important;
-  z-index: 1020;
-  box-shadow: inset 0 -2px 0 #dee2e6; /* Bottom border effect */
-}
-
-/* Table layout tweaks */
-.rank-col {
-  font-weight: 600;
-}
-
-.badge-tag {
-  background-color: #e9ecef;
-  color: #495057;
-  padding: 0.2em 0.5em;
-  font-size: 0.75rem;
-  border-radius: 0.25rem;
-}
-
-#toggleFinalAssignment.active {
-  background-color: #0d6efd;
-  color: #ffffff;
-}
+// Initialize on page DOM load
+document.addEventListener('DOMContentLoaded', () => {
+  renderFilterContainer();
+});
