@@ -5,7 +5,8 @@ const activeMultiFilters = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Initializing NEET PG Explorer with CSV...");
-  loadCSVData('https://raw.githubusercontent.com/username/repo-name/main/data.csv');
+  // Fetches data.csv from the same hosted folder on GitHub Pages
+  loadCSVData('./data.csv');
 
   // Close multi-select dropdowns when clicking outside
   document.addEventListener("click", (e) => {
@@ -21,7 +22,7 @@ function loadCSVData(filePath) {
   Papa.parse(filePath, {
     download: true,
     header: true,
-    delimiter: "", // Auto-detect delimiter (works for comma CSV and tab TSV)
+    delimiter: "", // Auto-detect delimiter (comma CSV or tab TSV)
     skipEmptyLines: true,
     complete: function (results) {
       console.log("PapaParse complete. Raw results:", results);
@@ -42,7 +43,7 @@ function loadCSVData(filePath) {
     error: function (err) {
       console.error("PapaParse failed to load file:", err);
       if (statusEl) {
-        statusEl.innerText = "Error loading data.csv. Make sure the file exists and you are running via a local web server.";
+        statusEl.innerText = "Error loading data.csv. Ensure data.csv is uploaded in the root folder of your repository.";
       }
     }
   });
