@@ -1,76 +1,27 @@
-/* COVID19India Inspired Theme - Subtle, Muted, Clean Typography */
-:root {
-  --bg-main: #f6f8fa;
-  --card-bg: #ffffff;
-  --text-primary: #24292e;
-  --text-secondary: #6a737d;
-  --border-color: #e1e4e8;
-  --accent-blue: #0366d6;
-  --accent-blue-light: #f1f8ff;
-  --toggle-active-bg: #28a745;
-  --toggle-active-border: #28a745;
+/* Sticky Navbar at top of screen */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
 }
 
-body {
-  background-color: var(--bg-main);
-  color: var(--text-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 0.9rem;
-  line-height: 1.5;
+/* Sticky Filter Panel directly under Navbar */
+#filter-container {
+  position: sticky;
+  top: 56px; /* Height of the Bootstrap navbar */
+  z-index: 1020;
+  background-color: #ffffff;
 }
 
-/* Navbar */
-.navbar-clean {
-  background-color: #1b1f23;
-  padding: 0.75rem 1.5rem;
-}
-
-.navbar-brand {
-  font-weight: 600;
-  font-size: 1.05rem;
-  letter-spacing: -0.3px;
-  color: #fff !important;
-}
-
-/* Data Explorer Card */
-.content-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-/* Filter Controls Header */
-.filter-box {
-  background-color: #fafbfc;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 1rem;
-}
-
+/* Multiselect Dropdown Styling */
 .filter-label {
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
+  color: #6c757d;
+  margin-bottom: 2px;
 }
 
-/* Custom Select Styling */
-.form-select-sm, .form-control-sm {
-  font-size: 0.82rem;
-  border-color: var(--border-color);
-  border-radius: 4px;
-  color: var(--text-primary);
-}
-
-.form-select-sm:focus, .form-control-sm:focus {
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.15);
-}
-
-/* Multi-select Dropdown Styling */
 .multiselect-dropdown {
   position: relative;
   width: 100%;
@@ -79,26 +30,20 @@ body {
 .multiselect-btn {
   width: 100%;
   text-align: left;
-  background-color: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  background-color: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
   padding: 0.25rem 0.5rem;
-  font-size: 0.82rem;
-  color: var(--text-primary);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  white-space: nowrap;
+  font-size: 0.875rem;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.multiselect-btn::after {
-  content: "▾";
-  font-size: 0.7rem;
-  margin-left: 6px;
-  color: var(--text-secondary);
+.multiselect-btn:focus {
+  outline: none;
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
 .multiselect-menu {
@@ -107,14 +52,14 @@ body {
   top: 100%;
   left: 0;
   right: 0;
-  z-index: 1000;
-  background: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  max-height: 220px;
+  max-height: 250px;
   overflow-y: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 0.4rem 0;
+  background-color: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1040 !important; /* Ensure menu stays above sticky table headers */
+  padding: 0.5rem;
 }
 
 .multiselect-menu.show {
@@ -122,123 +67,33 @@ body {
 }
 
 .multiselect-item {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8rem;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.4rem;
   cursor: pointer;
-  user-select: none;
+  border-radius: 0.2rem;
 }
 
 .multiselect-item:hover {
-  background-color: var(--accent-blue-light);
+  background-color: #f8f9fa;
 }
 
-.multiselect-item input[type="checkbox"] {
-  cursor: pointer;
-}
-
-/* Table Styling */
-.table-container {
-  overflow-x: auto;
-}
-
-table.dataTable {
-  border-collapse: collapse !important;
-  font-size: 0.83rem;
-  color: var(--text-primary);
-  width: 100% !important;
-}
-
-table.dataTable thead th {
-  background-color: #f6f8fa;
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  border-bottom: 2px solid var(--border-color) !important;
-  padding: 8px 10px;
-}
-
-table.dataTable tbody td {
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border-color);
-  vertical-align: middle;
-}
-
-table.dataTable tbody tr:hover {
-  background-color: #f1f8ff !important;
-}
-
-/* Monospace Numerical Values for Clean Alignment */
+/* Table Styling & Badge */
 .rank-col {
-  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
   font-weight: 600;
-  color: #0366d6;
 }
 
 .badge-tag {
-  font-size: 0.72rem;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-weight: 500;
-  background-color: #eaecef;
-  color: #24292e;
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 0.2em 0.5em;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
 }
 
-/* Final Assignment Toggle Button */
-.btn-final-assignment {
-  background-color: #ffffff;
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  font-size: 0.8rem;
-  font-weight: 600;
-  padding: 0.3rem 0.75rem;
-  border-radius: 4px;
-  transition: all 0.15s ease-in-out;
-}
-
-.btn-final-assignment.active {
-  background-color: var(--toggle-active-bg);
+#toggleFinalAssignment.active {
+  background-color: #0d6efd;
   color: #ffffff;
-  border-color: var(--toggle-active-border);
-}
-
-.btn-final-assignment:focus {
-  box-shadow: none;
-}
-
-/* Fix header navigation at the top */
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1030;
-}
-
-/* Fix filter panel directly below navbar */
-#filter-container {
-  position: sticky;
-  top: 56px; /* Height of your navbar; adjust if navbar height differs */
-  z-index: 1020;
-  background-color: #ffffff;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #dee2e6;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-/* Fix table header row */
-#neetTable thead th {
-  position: sticky;
-  top: 190px; /* Offset to clear navbar + sticky filter panel */
-  background-color: #f8f9fa;
-  z-index: 1010;
-  box-shadow: inset 0 -2px 0 #dee2e6;
-}
-
-/* Ensure multi-select filter dropdown menus render above sticky headers */
-.multiselect-menu {
-  z-index: 1040 !important;
 }
