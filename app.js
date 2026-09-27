@@ -5,7 +5,6 @@ const activeMultiFilters = {};
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Initializing NEET PG Explorer with CSV...");
-  // Fetches data.csv from the same hosted folder on GitHub Pages
   loadCSVData('./data.csv');
 
   // Close multi-select dropdowns when clicking outside
@@ -22,7 +21,7 @@ function loadCSVData(filePath) {
   Papa.parse(filePath, {
     download: true,
     header: true,
-    delimiter: "", // Auto-detect delimiter (comma CSV or tab TSV)
+    delimiter: "", // Auto-detect delimiter (works for comma CSV and tab TSV)
     skipEmptyLines: true,
     complete: function (results) {
       console.log("PapaParse complete. Raw results:", results);
@@ -43,7 +42,7 @@ function loadCSVData(filePath) {
     error: function (err) {
       console.error("PapaParse failed to load file:", err);
       if (statusEl) {
-        statusEl.innerText = "Error loading data.csv. Ensure data.csv is uploaded in the root folder of your repository.";
+        statusEl.innerText = "Error loading data.csv. Ensure data.csv is committed to your repo root.";
       }
     }
   });
@@ -108,7 +107,10 @@ function initDataTable(data) {
     return true;
   });
 
-  // Initialize DataTables
+  // Calculate sticky offset (navbar height ~56px + filter container height)
+  const navAndFilterHeight = 56 + ($('#filter-container').outerHeight() || 60);
+
+  // Initialize DataTables with FixedHeader
   dataTableInstance = $('#neetTable').DataTable({
     data: tableData,
     pageLength: 25,
@@ -116,6 +118,10 @@ function initDataTable(data) {
     order: [[0, 'asc']],
     responsive: true,
     deferRender: true,
+    fixedHeader: {
+      header: true,
+      headerOffset: navAndFilterHeight
+    },
     columns: [
       { title: "Rank", className: "rank-col" },
       { title: "Quota" },
@@ -224,7 +230,7 @@ function setupMultiSelectFilters(api) {
 
   // Min / Max Rank Range Controls
   const rankDiv = document.createElement("div");
-  rankDiv.className = "col-md-4 col-sm-8 d-flex gap-2 align-items-end";
+  rankDiv.className = "col-md-4 col-sm-8 d-flex gap-2 align-items-end mt-2 mt-md-0";
   rankDiv.innerHTML = `
     <div class="w-50">
       <div class="filter-label">Min Rank</div>
