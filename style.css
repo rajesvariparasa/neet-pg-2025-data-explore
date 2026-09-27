@@ -16,7 +16,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Horizontal Filters Wrapper - Side-by-side layout */
+/* Horizontal Filters Wrapper */
 .filters-row {
   display: flex;
   flex-direction: row;
