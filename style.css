@@ -16,9 +16,10 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Horizontal Filters Wrapper */
+/* Horizontal Filters Wrapper - Side-by-side layout */
 .filters-row {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 1rem;
@@ -113,9 +114,4 @@
   padding: 0.2em 0.5em;
   font-size: 0.75rem;
   border-radius: 0.25rem;
-}
-
-#toggleFinalAssignment.active {
-  background-color: #0d6efd;
-  color: #ffffff;
 }
