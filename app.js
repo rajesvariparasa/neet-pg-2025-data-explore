@@ -1,4 +1,6 @@
-/* Helper function to generate dynamic filters inside #filter-container */
+let dataTable = null;
+
+// Render sticky filter inputs inside top panel
 function renderFilterContainer() {
   const container = document.getElementById('filter-container');
   if (!container) return;
@@ -40,29 +42,85 @@ function renderFilterContainer() {
       <div class="rank-filter-item">
         <div class="filter-label">Rank Range</div>
         <div class="d-flex gap-1">
-          <input type="number" id="minRank" class="form-control form-control-sm" placeholder="Min">
-          <input type="number" id="maxRank" class="form-control form-control-sm" placeholder="Max">
+          <input type="number" id="minRank" class="form-control form-control-sm" placeholder="Min" oninput="filterTable()">
+          <input type="number" id="maxRank" class="form-control form-control-sm" placeholder="Max" oninput="filterTable()">
         </div>
       </div>
     </div>
   `;
 }
 
-/* Handler for the Final Allotment Round Only switch */
+// Fetch CSV file or load mock dataset if CSV fetching is blocked locally
+function loadData() {
+  const dataStatus = document.getElementById('data-status');
+
+  // Replace 'data.csv' with your local CSV path if applicable
+  Papa.parse("data.csv", {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function (results) {
+      if (results.data && results.data.length > 0) {
+        initDataTable(results.data);
+        if (dataStatus) dataStatus.textContent = `${results.data.length} Records Loaded`;
+      } else {
+        loadFallbackMockData();
+      }
+    },
+    error: function () {
+      // If fetching fails (e.g. running directly via file:// protocol), load sample data
+      loadFallbackMockData();
+    }
+  });
+}
+
+// Fallback sample data to ensure table loads cleanly
+function loadFallbackMockData() {
+  const mockData = [
+    { Rank: "125", Round: "Round 1", Quota: "All India", Category: "General", Course: "MD Radio Diagnosis", College: "MAMC Delhi" },
+    { Rank: "450", Round: "Round 1", Quota: "All India", Category: "OBC", Course: "General Medicine", College: "KGMU Lucknow" },
+    { Rank: "890", Round: "Round 2", Quota: "State Quota", Category: "SC", Course: "MS General Surgery", College: "MMC Chennai" },
+    { Rank: "1250", Round: "Round 2", Quota: "All India", Category: "EWS", Course: "MD Pediatrics", College: "BJMC Ahmedabad" }
+  ];
+
+  initDataTable(mockData);
+  const dataStatus = document.getElementById('data-status');
+  if (dataStatus) dataStatus.textContent = `${mockData.length} Records Loaded (Sample Data)`;
+}
+
+// Initialize DataTables with fetched array
+function initDataTable(data) {
+  if ($.fn.DataTable.isDataTable('#neetTable')) {
+    $('#neetTable').DataTable().destroy();
+    $('#neetTable').empty();
+  }
+
+  const columns = Object.keys(data[0]).map(key => ({
+    title: key,
+    data: key,
+    className: key.toLowerCase().includes('rank') ? 'rank-col' : ''
+  }));
+
+  dataTable = $('#neetTable').DataTable({
+    data: data,
+    columns: columns,
+    pageLength: 25,
+    responsive: true,
+    order: [[0, 'asc']]
+  });
+}
+
 function toggleFinalAssignmentFilter() {
   const toggleSwitch = document.getElementById('toggleFinalAssignment');
   const statusText = document.getElementById('finalStatusText');
 
   if (toggleSwitch && toggleSwitch.checked) {
     statusText.textContent = '(Final allotment only)';
-    // Implement custom data table filtering logic here
   } else {
     statusText.textContent = '(Showing all rounds)';
-    // Reset or show all rounds filtering logic here
   }
 }
 
-/* Helper to toggle dropdown visibility */
 function toggleDropdown(id) {
   const menu = document.getElementById(`menu-${id}`);
   if (menu) {
@@ -70,7 +128,6 @@ function toggleDropdown(id) {
   }
 }
 
-/* Helper to reset all filters */
 function resetAllFilters() {
   const toggleSwitch = document.getElementById('toggleFinalAssignment');
   if (toggleSwitch) {
@@ -81,9 +138,18 @@ function resetAllFilters() {
   const maxRank = document.getElementById('maxRank');
   if (minRank) minRank.value = '';
   if (maxRank) maxRank.value = '';
+
+  if (dataTable) {
+    dataTable.search('').columns().search('').draw();
+  }
 }
 
-// Initialize on page DOM load
+function copyShareLink() {
+  navigator.clipboard.writeText(window.location.href);
+  alert("Link copied to clipboard!");
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderFilterContainer();
+  loadData();
 });
