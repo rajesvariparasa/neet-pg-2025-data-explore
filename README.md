@@ -87,6 +87,7 @@ For counselling decisions, seat availability, eligibility, allotment status, or 
 * **[Live Data Explorer](https://rajesvariparasa.github.io/neet-pg-2025-data-explore/)**
 * **[GitHub Repository](https://github.com/rajesvariparasa/neet-pg-2025-data-explore)**
 * **[Official MCC Website](https://mcc.nic.in/)**
+* **[Data Extraction Notebook](./neet_pg_counselling_data_extraction_from_pdfs.ipynb)** 
 * **[Extracted Dataset](./data.csv)**
 
 ## 🛠️ Built With
