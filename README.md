@@ -93,6 +93,3 @@ For counselling decisions, seat availability, eligibility, allotment status, or 
 
 HTML · CSS · JavaScript · Bootstrap · DataTables · PapaParse
 
-## 📜 License
-
-See the repository for licensing and data-source information.
