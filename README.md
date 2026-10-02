@@ -62,7 +62,7 @@ No. The data has been extracted and checked on a best-effort basis, but **accura
 
 ### 💾 Where can I get the extracted dataset?
 
-The extracted dataset is available as [`data.csv`](./data.csv) in this repository. The data extraction codebook can be found [here](./neet_pg_counselling_data_extraction_from_pdfs.ipynb).
+The extracted dataset is available as [`data.csv`](./data.csv) in this repository. The data extraction codebook can be found here [`neet_pg_counselling_data_extraction_from_pdfs.ipynb`](./neet_pg_counselling_data_extraction_from_pdfs.ipynb).
 
 ### 🐛 Where can I report a possible data error?
 
